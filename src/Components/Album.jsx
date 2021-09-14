@@ -3,7 +3,10 @@ import React from 'react';
 class Album extends React.Component {
   render() {
     return (
-      <p>Componente Album</p>
+      <div data-testid="page-album">
+
+        <p>Componente Album</p>
+      </div>
     );
   }
 }

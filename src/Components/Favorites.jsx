@@ -3,7 +3,9 @@ import React from 'react';
 class Favorites extends React.Component {
   render() {
     return (
-      <p>Componente Favorites</p>
+      <div data-testid="page-favorites">
+        <p>Componente Favorites</p>
+      </div>
     );
   }
 }

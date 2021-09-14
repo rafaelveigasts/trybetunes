@@ -12,5 +12,7 @@ class App extends React.Component {
 export default App;
 
 /*
-1º Passo de todos, criar os componentes
+Fiz um switcher para não poluir o render
+
+Requisito 1: Criar os componentes e colcoar dentro de uma div com o atributo conforme o enunciado.
 */
