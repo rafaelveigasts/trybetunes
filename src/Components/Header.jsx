@@ -85,4 +85,6 @@ fonte: https://reactrouter.com/web/api/Link
 3º a propriedade to="" é para onde vamos direcionar, fazemos 3 links no total, para search, fav e profile.
 
 Se colocar tudo isso dentro de uma div ele fica mais no centro da tela, eu deixei só uma lista para ficar melhor alinhado.
+
+<<<<<***>>>>>
 */
