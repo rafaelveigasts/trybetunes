@@ -14,6 +14,7 @@ class Switcher extends React.Component {
       <BrowserRouter>
         <h3>App Trybetunes</h3>
         <Switch>
+          <Route path="/album/:id" render={ (props) => <Album { ...props } /> } />
           <Route path="/album/:id" component={ Album } />
           <Route path="/profile/edit" component={ ProfileEdit } />
           <Route path="/search" component={ Search } />
