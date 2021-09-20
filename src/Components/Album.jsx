@@ -3,6 +3,7 @@ import React from 'react';
 import { shape, objectOf, string } from 'prop-types';
 import Header from './Header';
 import getMusics from '../services/musicsAPI';
+import { addSong, getFavoriteSongs, removeSong } from '../services/favoriteSongsAPI';
 import MusicCard from './MusicCard';
 import Loading from './Loading';
 
@@ -12,19 +13,47 @@ class Album extends React.Component {
 
     this.state = {
       songList: [],
+      favList: [],
       artistName: '',
       collectionName: '',
       loading: true,
     };
 
-    this.fetchSong = this.fetchSong.bind(this);
+    this.fetchSongList = this.fetchSongList.bind(this);
+    this.checkboxHandler = this.checkboxHandler.bind(this);
+    this.setFavList = this.setFavList.bind(this);
   }
 
-  componentDidMount() {
-    this.fetchSong();
+  async componentDidMount() {
+    const list = await getFavoriteSongs();
+    this.setFavList(list);
+    this.fetchSongList();
   }
 
-  async fetchSong() {
+  async setFavList(favoriteList) {
+    // const list = await getFavoriteSongs();
+    this.setState({ favList: favoriteList });
+    console.log(favoriteList);
+  }
+
+  async checkboxHandler({ target }) {
+    const { songList } = this.state;
+    this.setState({ loading: true });
+    const songId = Number(target.value);
+    const songData = songList.find((song) => songId === song.trackId);
+    if (target.checked) {
+      await addSong(songData);
+      console.log('Adicionado', songData);
+    } else {
+      await removeSong(songData);
+      console.log('Removido', songData);
+    }
+    const list = await getFavoriteSongs();
+    this.setFavList(list);
+    this.setState({ loading: false });
+  }
+
+  async fetchSongList() {
     const { match: { params: { id } } } = this.props;
     const list = await getMusics(id);
     const { artistName } = list[0];
@@ -36,33 +65,40 @@ class Album extends React.Component {
       collectionName,
       loading: false,
     });
-    console.log(list);
   }
 
-  renderSong() {
-    const { songList } = this.state;
-    console.log(songList);
+  renderSongList() {
+    const { songList, artistName, collectionName, favList } = this.state;
     return (
       <div>
+        <h1 data-testid="artist-name">{ artistName }</h1>
+        <h2 data-testid="album-name">{ collectionName }</h2>
         { songList.map((song, i) => (
           <MusicCard
             key={ i }
             trackName={ song.trackName }
             previewUrl={ song.previewUrl }
+            trackId={ song.trackId }
+            song={ song }
+            checked={
+              favList.some((fav) => JSON.stringify(fav) === JSON.stringify(song))
+            }
+            favList={ favList }
+            checkboxHandler={ this.checkboxHandler }
           />
+
         ))}
       </div>
     );
   }
 
   render() {
-    const { artistName, collectionName, loading } = this.state;
+    const { loading } = this.state;
     return (
       <div data-testid="page-album">
         <Header />
-        <h1 data-testid="artist-name">{ artistName }</h1>
-        <h2 data-testid="album-name">{ collectionName }</h2>
-        { loading ? <Loading /> : this.renderSong() }
+        { loading ? <Loading /> : this.renderSongList() }
+        {/* { this.renderSongList() } */}
       </div>
     );
   }
@@ -108,4 +144,30 @@ fazemos um h1 para o nome do artista,
 um h2 com o nome do album
 e um ternario para que se a requisição tiver em curso, renderizar o loading, se não as musicas
 
+<<<<<***>>>>>
+
+Requisito 8: criar o mecanismo para adicionar aos favoritos
+
+Desenvolvimento:
+1º setar o estado do favorito, fazemos uma fn que vai setar o estado de favorito que receberá uma lista, então um array pra isso.
+2º depois de fazer o input la no moviecard voltamos pra ca para fazer a funcinalidade.
+Aqui não dá pra fazer a fn gernérica do checkbox pois ela não muda só o estado como também faz uma busca.
+Então para isso acontecer temos que desconstruir o target do evento do click,
+como vamos trabalhar com a songList pegamos ela do estado
+definimos o loading para true
+pegamos o songID através do clique com o valor do target passando ele para numero
+com isso fazemos uma busca para ver se o value bate com o trackID do obj da requisição que fizemos,
+como isso vai ser um true ou false armazenamos isso numa const
+como temos um bool fazemos uma verificação com o if
+se o alvo tiver a propriedade checked ele adiciona atravez da fn addsong a musica que foi encontrada pelo songData.
+caso ele não tenha a propriedade checked ele remove.
+
+criamos uma const para armazenar a lista de favoritos que pegamos atravez da fn getfavoritesong
+setamos a lista de favoritos com os dados armazenados na lista que criamos acima
+terminamos o loading mudando o estado para falso
+
+Passamos a props dentro do rendersonglist checked que ao clicar vai fazer a busca que mencionamos acima
+fazemos uma props favlist que é o nosso estado atualizado
+
+Agradecimentos a Leandro Xavier, Matheus Laurindo, Michael Caxias e a monitoria que ajudaram a completar o projeto
 */
